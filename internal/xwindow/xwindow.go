@@ -2,18 +2,17 @@ package xwindow
 
 import (
 	"fmt"
-	"image"
-	"image/color"
-
+	"github.com/4nte/screenshot/internal/util"
 	"github.com/BurntSushi/xgb"
 	mshm "github.com/BurntSushi/xgb/shm"
 	"github.com/BurntSushi/xgb/xinerama"
 	"github.com/BurntSushi/xgb/xproto"
 	"github.com/gen2brain/shm"
-	"github.com/kbinani/screenshot/internal/util"
+	"image"
+	"image/color"
 )
 
-func Capture(x, y, width, height int) (img *image.RGBA, e error) {
+func Capture(c *xgb.Conn, x, y, width, height int) (img *image.RGBA, e error) {
 	defer func() {
 		err := recover()
 		if err != nil {
@@ -21,13 +20,8 @@ func Capture(x, y, width, height int) (img *image.RGBA, e error) {
 			e = fmt.Errorf("%v", err)
 		}
 	}()
-	c, err := xgb.NewConn()
-	if err != nil {
-		return nil, err
-	}
-	defer c.Close()
 
-	err = xinerama.Init(c)
+	err := xinerama.Init(c)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +123,7 @@ func Capture(x, y, width, height int) (img *image.RGBA, e error) {
 	return img, e
 }
 
-func NumActiveDisplays() (num int) {
+func NumActiveDisplays(c *xgb.Conn) (num int) {
 	defer func() {
 		e := recover()
 		if e != nil {
@@ -137,13 +131,7 @@ func NumActiveDisplays() (num int) {
 		}
 	}()
 
-	c, err := xgb.NewConn()
-	if err != nil {
-		return 0
-	}
-	defer c.Close()
-
-	err = xinerama.Init(c)
+	err := xinerama.Init(c)
 	if err != nil {
 		return 0
 	}
@@ -157,7 +145,7 @@ func NumActiveDisplays() (num int) {
 	return num
 }
 
-func GetDisplayBounds(displayIndex int) (rect image.Rectangle) {
+func GetDisplayBounds(c *xgb.Conn, displayIndex int) (rect image.Rectangle) {
 	defer func() {
 		e := recover()
 		if e != nil {
@@ -165,13 +153,7 @@ func GetDisplayBounds(displayIndex int) (rect image.Rectangle) {
 		}
 	}()
 
-	c, err := xgb.NewConn()
-	if err != nil {
-		return image.ZR
-	}
-	defer c.Close()
-
-	err = xinerama.Init(c)
+	err := xinerama.Init(c)
 	if err != nil {
 		return image.ZR
 	}

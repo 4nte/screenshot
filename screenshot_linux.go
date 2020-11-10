@@ -1,9 +1,8 @@
 package screenshot
 
 import (
+	"github.com/4nte/screenshot/internal/xwindow"
 	"image"
-
-	"github.com/kbinani/screenshot/internal/xwindow"
 )
 
 // Capture returns screen capture of specified desktop region.

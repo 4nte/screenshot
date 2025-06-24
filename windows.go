@@ -1,9 +1,10 @@
+//go:build windows
+
 package screenshot
 
 import (
 	"errors"
-	"github.com/kbinani/screenshot/internal/util"
-	win "github.com/lxn/win"
+	"github.com/lxn/win"
 	"image"
 	"syscall"
 	"unsafe"
@@ -19,7 +20,7 @@ var (
 
 func Capture(x, y, width, height int) (*image.RGBA, error) {
 	rect := image.Rect(0, 0, width, height)
-	img, err := util.CreateImage(rect)
+	img, err := createImage(rect)
 	if err != nil {
 		return nil, err
 	}
@@ -92,22 +93,6 @@ func Capture(x, y, width, height int) (*image.RGBA, error) {
 	}
 
 	return img, nil
-}
-
-func NumActiveDisplays() int {
-	var count int = 0
-	enumDisplayMonitors(win.HDC(0), nil, syscall.NewCallback(countupMonitorCallback), uintptr(unsafe.Pointer(&count)))
-	return count
-}
-
-func GetDisplayBounds(displayIndex int) image.Rectangle {
-	var ctx getMonitorBoundsContext
-	ctx.Index = displayIndex
-	ctx.Count = 0
-	enumDisplayMonitors(win.HDC(0), nil, syscall.NewCallback(getMonitorBoundsCallback), uintptr(unsafe.Pointer(&ctx)))
-	return image.Rect(
-		int(ctx.Rect.Left), int(ctx.Rect.Top),
-		int(ctx.Rect.Right), int(ctx.Rect.Bottom))
 }
 
 func getDesktopWindow() win.HWND {
